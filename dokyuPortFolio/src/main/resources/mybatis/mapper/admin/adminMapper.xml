@@ -1,0 +1,313 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dokyuportfolio.admin.mapper.AdminMapper">
+	
+	<select id="selectMenuCount" resultType="int">
+		SELECT COUNT(*) FROM TB_MENU
+	</select>
+	
+	<select id="selectMenuList" parameterType="com.dokyuportfolio.admin.vo.MenuVO" resultType="com.dokyuportfolio.admin.vo.MenuVO">
+		SELECT
+			MENU_SEQ,
+			MENU_ID,
+			MENU_NAME,
+			MENU_URL,
+			PARENT_MENU_SEQ,
+			INST_ID,
+			DATE_FORMAT(INST_DATE,'%Y-%m-%d %H:%i:%s') INST_DATE,
+			UPDT_ID,
+			UPDT_DATE
+		FROM
+			TB_MENU
+		ORDER BY INST_DATE DESC
+		LIMIT #{startPostNumber} , #{blockPostCnt}
+	</select>
+	
+	<select id="selectMenuByMenuId" parameterType="com.dokyuportfolio.admin.vo.MenuVO" resultType="String">
+		SELECT MENU_ID FROM TB_MENU WHERE MENU_ID = #{menuId}
+	</select>
+	
+	<insert id="insertMenu" parameterType="com.dokyuportfolio.admin.vo.MenuVO">
+		INSERT INTO TB_MENU VALUES (#{menuSeq},#{menuId},#{menuName},#{menuUrl},#{parentMenuSeq},#{instId},NOW(),NULL,NULL)
+	</insert>
+	
+	<update id="updateMenu" parameterType="com.dokyuportfolio.admin.vo.MenuVO">
+		UPDATE TB_MENU SET 
+			MENU_NAME = #{menuName} , 
+			MENU_URL = #{menuUrl} , 
+			PARENT_MENU_SEQ = #{parentMenuSeq} , 
+			UPDT_ID = #{updtId} , 
+			UPDT_DATE = NOW() 
+		WHERE 
+			MENU_SEQ = #{menuSeq} 
+			AND 
+			MENU_ID = #{menuId}
+	</update>
+	
+	<delete id="deleteMenu" parameterType="String">
+		DELETE FROM TB_MENU WHERE MENU_SEQ IN 
+		<foreach item="item" collection="array" open="(" close=")" separator=",">
+			'${item}'
+		</foreach>
+	</delete>
+	
+	<select id="selectMenuInfo" parameterType="com.dokyuportfolio.admin.vo.MenuVO" resultType="com.dokyuportfolio.admin.vo.MenuVO">
+		SELECT * FROM TB_MENU WHERE MENU_SEQ = #{menuSeq}
+	</select>
+	
+	<select id="selectUserCount" resultType="int">
+		SELECT COUNT(*) FROM TB_USER
+	</select>
+	
+	<select id="selectUserList" parameterType="com.dokyuportfolio.main.vo.UserVO" resultType="com.dokyuportfolio.main.vo.UserVO">
+		SELECT
+			USER_SEQ,
+			USER_ID,
+			USER_NAME,
+			EMAIL,
+			USER_PWD,
+			USER_PWD_KEY,
+			CASE USER_AUTH WHEN 0 THEN '관리자' WHEN 1 THEN '일반유저' END USER_AUTH,
+			CASE USE_YN WHEN 'Y' THEN '사용' ELSE '삭제' END USE_YN,
+			REG_DATE,
+			UDT_DATE
+		FROM
+			TB_USER
+		ORDER BY REG_DATE DESC
+		LIMIT #{startPostNumber} , #{blockPostCnt}
+	</select>
+	
+	<select id="selectUserInfo" parameterType="com.dokyuportfolio.main.vo.UserVO" resultType="com.dokyuportfolio.main.vo.UserVO">
+		SELECT
+			USER_SEQ,
+			USER_ID,
+			USER_NAME,
+			EMAIL,
+			USER_PWD,
+			USER_PWD_KEY,
+			USER_AUTH,
+			USE_YN,
+			REG_DATE,
+			UDT_DATE
+		FROM
+			TB_USER
+		WHERE
+			USER_SEQ = #{userSeq}
+	</select>
+	
+	<update id="updateUser" parameterType="com.dokyuportfolio.main.vo.UserVO">
+		UPDATE TB_USER SET USER_NAME = #{userName} , EMAIL = #{email} , USER_AUTH = #{userAuth} , USE_YN = #{useYn} WHERE USER_SEQ = #{userSeq}
+	</update>
+	
+	<select id="selectBoardCount" parameterType="com.dokyuportfolio.admin.vo.BoardVO" resultType="int">
+		SELECT 
+			COUNT(*) 
+		FROM 
+			TB_BOARD 
+		<where>
+			<if test="categoryId != null and categoryId != ''">
+				AND CATEGORY_ID = #{categoryId}
+			</if>
+		</where>
+	</select>
+	
+	<select id="selectBoardList" parameterType="com.dokyuportfolio.admin.vo.BoardVO" resultType="com.dokyuportfolio.admin.vo.BoardVO">
+		SELECT
+			BOARD_SEQ,
+			TITLE,
+			CONTENT,
+			EXPLANATION,
+			MAIN_TOP_VIEW,
+			CATEGORY_ID,
+			(SELECT CATEGORY_NAME FROM TB_CATEGORY WHERE CATEGORY_ID = B.CATEGORY_ID) CATEGORY_NAME,
+			INST_ID,
+			INST_DATE,
+			UPDT_ID,
+			UPDT_DATE
+		FROM
+			TB_BOARD B
+		<where>
+			<if test="categoryId != null and categoryId != ''">
+				AND B.CATEGORY_ID = #{categoryId}
+			</if>
+		</where>
+		ORDER BY INST_DATE DESC
+		LIMIT #{startPostNumber} , #{blockPostCnt}
+	</select>
+	
+	<select id="selectCategoryListForSelectBox" resultType="com.dokyuportfolio.admin.vo.CategoryVO">
+		SELECT * FROM TB_CATEGORY ORDER BY INST_DATE
+	</select>
+	
+	<select id="selectCategoryCount" resultType="int">
+		SELECT COUNT(*) FROM TB_CATEGORY
+	</select>
+	
+	<select id="selectCategoryList" parameterType="com.dokyuportfolio.admin.vo.CategoryVO" resultType="com.dokyuportfolio.admin.vo.CategoryVO">
+		SELECT
+			CATEGORY_SEQ,
+			CATEGORY_ID,
+			CATEGORY_NAME,
+			MAIN_VIEW_AREA,
+			INST_ID,
+			INST_DATE
+		FROM
+			TB_CATEGORY
+		ORDER BY INST_DATE DESC
+		LIMIT #{startPostNumber} , #{blockPostCnt}
+	</select>
+	
+	<select id="selectCategoryByCategoryId" parameterType="com.dokyuportfolio.admin.vo.CategoryVO" resultType="String">
+		SELECT CATEGORY_ID FROM TB_CATEGORY WHERE CATEGORY_ID = #{categoryId}
+	</select>
+	
+	<insert id="insertCategory" parameterType="com.dokyuportfolio.admin.vo.CategoryVO">
+		INSERT INTO TB_CATEGORY VALUES (#{categorySeq},#{categoryId},#{categoryName},#{mainViewArea},#{instId},NOW())
+	</insert>
+	
+	<select id="selectCategoryInfo" parameterType="com.dokyuportfolio.admin.vo.CategoryVO" resultType="com.dokyuportfolio.admin.vo.CategoryVO">
+		SELECT * FROM TB_CATEGORY WHERE CATEGORY_SEQ = #{categorySeq}
+	</select>
+	
+	<update id="updateCategory" parameterType="com.dokyuportfolio.admin.vo.CategoryVO">
+		UPDATE TB_CATEGORY SET
+			CATEGORY_NAME = #{categoryName},
+			MAIN_VIEW_AREA = #{mainViewArea}
+		WHERE 
+			CATEGORY_SEQ = #{categorySeq} 
+			AND 
+			CATEGORY_ID = #{categoryId}
+	</update>
+	
+	<delete id="deleteCategory" parameterType="String">
+		DELETE FROM TB_CATEGORY WHERE CATEGORY_SEQ IN 
+		<foreach item="item" collection="array" open="(" close=")" separator=",">
+			'${item}'
+		</foreach>
+	</delete>
+	
+	<insert id="insertBoard" parameterType="com.dokyuportfolio.admin.vo.BoardVO">
+		INSERT INTO TB_BOARD VALUES (#{boardSeq} , #{title} , #{content} ,  #{explanation} , #{mainTopView} , #{categoryId} , #{instId} , NOW() , NULL , NULL)
+	</insert>
+	
+	<update id="updateBoard" parameterType="com.dokyuportfolio.admin.vo.BoardVO">
+		UPDATE TB_BOARD SET 
+			TITLE = #{title} ,
+			EXPLANATION = #{explanation} ,
+			CONTENT = #{content} ,
+			MAIN_TOP_VIEW = #{mainTopView} ,
+			CATEGORY_ID = #{categoryId} ,
+			UPDT_ID = #{updtId} ,
+			UPDT_DATE = NOW()
+		WHERE
+			BOARD_SEQ = #{boardSeq}
+	</update>
+	
+	<insert id="insertFile" parameterType="com.dokyuportfolio.admin.vo.FileVO">
+		INSERT INTO TB_FILE VALUES
+		(
+			#{fileSeq},
+			#{boardSeq},
+			#{originFileName},
+			#{extensionName},
+			#{fileSize},
+			#{saveFileName},
+			#{saveFilePath},
+			#{fileUrl},
+			#{fileKind},
+			#{instId},
+			NOW()
+		)
+	</insert>
+	
+	<select id="selectBoardInfoByBoardSeq" parameterType="com.dokyuportfolio.admin.vo.BoardVO" resultType="com.dokyuportfolio.admin.vo.BoardVO">
+		SELECT
+			BOARD_SEQ,
+			TITLE,
+			EXPLANATION,
+			CONTENT,
+			MAIN_TOP_VIEW,
+			CATEGORY_ID,
+			INST_ID,
+			INST_DATE,
+			UPDT_ID,
+			UPDT_DATE
+		FROM
+			TB_BOARD
+		WHERE
+			BOARD_SEQ = #{boardSeq}
+	</select>
+	
+	<select id="selectThumbnailFileByBoardSeq" parameterType="com.dokyuportfolio.admin.vo.BoardVO" resultType="com.dokyuportfolio.admin.vo.FileVO">
+		SELECT
+			FILE_SEQ,
+			BOARD_SEQ,
+			ORIGIN_FILE_NAME,
+			EXTENSION_NAME,
+			FILE_SIZE,
+			SAVE_FILE_NAME,
+			SAVE_FILE_PATH,
+			FILE_URL,
+			FILE_KIND,
+			INST_ID,
+			INST_DATE
+		FROM
+			TB_FILE
+		WHERE
+			BOARD_SEQ = #{boardSeq}
+			AND
+			FILE_KIND = 'thumbnail'
+	</select>
+	
+	<select id="selectFileListByBoardSeq" parameterType="com.dokyuportfolio.admin.vo.BoardVO" resultType="com.dokyuportfolio.admin.vo.FileVO">
+		SELECT
+			FILE_SEQ,
+			BOARD_SEQ,
+			ORIGIN_FILE_NAME,
+			EXTENSION_NAME,
+			FILE_SIZE,
+			SAVE_FILE_NAME,
+			SAVE_FILE_PATH,
+			FILE_URL,
+			FILE_KIND,
+			INST_ID,
+			INST_DATE
+		FROM
+			TB_FILE
+		WHERE
+			BOARD_SEQ = #{boardSeq}
+			AND
+			FILE_KIND = 'file'
+	</select>
+	
+	<select id="selectFileInfo" parameterType="com.dokyuportfolio.admin.vo.FileVO" resultType="com.dokyuportfolio.admin.vo.FileVO">
+		SELECT
+			FILE_SEQ,
+			BOARD_SEQ,
+			ORIGIN_FILE_NAME,
+			EXTENSION_NAME,
+			FILE_SIZE,
+			SAVE_FILE_NAME,
+			SAVE_FILE_PATH,
+			FILE_URL,
+			FILE_KIND,
+			INST_ID,
+			INST_DATE
+		FROM
+			TB_FILE
+		WHERE
+			FILE_SEQ = #{fileSeq}
+	</select>
+	
+	<delete id="deleteFile" parameterType="com.dokyuportfolio.admin.vo.FileVO">
+		DELETE FROM TB_FILE WHERE FILE_SEQ = #{fileSeq}
+	</delete>
+	
+	<update id="updateMainTopViewAll">
+		UPDATE TB_BOARD SET MAIN_TOP_VIEW = 'N'
+	</update>
+	
+	<delete id="deleteBoard" parameterType="com.dokyuportfolio.admin.vo.BoardVO">
+		DELETE FROM TB_BOARD WHERE BOARD_SEQ = #{boardSeq}
+	</delete>
+</mapper>

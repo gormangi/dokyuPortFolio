@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE tiles-definitions PUBLIC "-//Apache Software Foundation//DTD Tiles Configuration 3.0//EN" "http://tiles.apache.org/dtds/tiles-config_3_0.dtd">
+<tiles-definitions>
+	<definition name=".base_layout" template="/WEB-INF/views/tiles/layout/base_layout.jsp">
+		<put-attribute name="sidebar" value="/WEB-INF/views/pages/main/sidebar.jsp" />
+	</definition>
+	<definition name="dokyuPortfolio/*/*" extends=".base_layout">
+		<put-attribute name="body" value="/WEB-INF/views/pages/{1}/{2}.jsp" />
+	</definition>
+	<definition name="dokyuPortfolio/*/*/*" extends=".base_layout">
+		<put-attribute name="body" value="/WEB-INF/views/pages/{1}/{2}/{3}.jsp" />
+	</definition>
+	<definition name="dokyuPortfolio/*/*/*/*" extends=".base_layout">
+		<put-attribute name="body" value="/WEB-INF/views/pages/{1}/{2}/{3}/{4}.jsp" />
+	</definition>
+	
+	<definition name=".admin_layout" template="/WEB-INF/views/tiles/layout/admin_layout.jsp">
+		<put-attribute name="header" value="/WEB-INF/views/pages/admin/header.jsp" />
+	</definition>
+	<definition name="admin/*/*" extends=".admin_layout">
+		<put-attribute name="section" value="/WEB-INF/views/pages/{1}/{2}.jsp" />
+	</definition>
+	<definition name="admin/*/*/*" extends=".admin_layout">
+		<put-attribute name="section" value="/WEB-INF/views/pages/{1}/{2}/{3}.jsp" />
+	</definition>
+	<definition name="admin/*/*/*/*" extends=".admin_layout">
+		<put-attribute name="section" value="/WEB-INF/views/pages/{1}/{2}/{3}/{4}.jsp" />
+	</definition>
+</tiles-definitions>

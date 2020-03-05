@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dokyuportfolio.main.mapper.MainMapper">
+	
+	<select id="selectUserIdCount" parameterType="String" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			TB_USER
+		WHERE
+			USER_ID = #{signForm_userId}
+	</select>
+	
+	<select id="selectUserNameCount" parameterType="String" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			TB_USER
+		WHERE
+			USER_NAME = #{signForm_userName}
+	</select>
+	
+	<select id="selectEmailCount" parameterType="String" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			TB_USER
+		WHERE
+			EMAIL = #{signForm_email}
+	</select>
+	
+	<insert id="insertUser" parameterType="com.dokyuportfolio.main.vo.UserVO">
+		INSERT INTO TB_USER VALUES (#{userSeq},#{userId},#{userName},#{email},#{userPwd},#{userPwdKey},1,'Y',NOW(),NULL)
+	</insert>
+	
+	<select id="selectUserInfoById" parameterType="com.dokyuportfolio.main.vo.UserVO" resultType="com.dokyuportfolio.main.vo.UserVO">
+		SELECT
+			*
+		FROM
+			TB_USER
+		WHERE
+			USER_ID = #{userId}
+			AND
+			USE_YN = 'Y'
+	</select>
+	
+	<select id="selectUserInfoByIdPwd" parameterType="com.dokyuportfolio.main.vo.UserVO" resultType="com.dokyuportfolio.main.vo.UserVO">
+		SELECT
+			*
+		FROM
+			TB_USER
+		WHERE
+			USER_ID = #{userId}
+			AND
+			USER_PWD = #{userPwd}
+			AND
+			USE_YN = 'Y'
+	</select>
+	
+	<select id="selectMenuList" resultType="com.dokyuportfolio.admin.vo.MenuVO">
+		SELECT
+			*
+		FROM
+			TB_MENU
+		ORDER BY INST_DATE
+	</select>
+	
+</mapper>

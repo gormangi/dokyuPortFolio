@@ -1,0 +1,13 @@
+.main_loginBtn{margin-right:30px;}
+.main_signBtn{margin-right:30px;}
+.loginForm_userId_div{height: 95px;}
+.signForm_userId_div{height: 95px;}
+.signForm_userName_div{height: 95px;}
+.signForm_email_div{height: 95px;}
+.signForm_userPwd_div{height: 95px;}
+
+.inner > section > .content > header > h1 {text-overflow:ellipsis;overflow: hidden; max-width:550px; white-space: nowrap;}
+.inner > section > .content > p {max-height:200px;overflow: hidden;}
+
+.inner > section > .posts > article > h3 {max-height:70px;overflow: hidden;}
+.inner > section > .posts > article > p {max-height:100px;overflow: hidden;}

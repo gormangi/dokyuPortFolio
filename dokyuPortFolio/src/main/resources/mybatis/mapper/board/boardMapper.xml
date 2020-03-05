@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dokyuportfolio.board.mapper.BoardMapper">
+
+	<select id="selectFileInfo" parameterType="com.dokyuportfolio.admin.vo.FileVO" resultType="com.dokyuportfolio.admin.vo.FileVO">
+		SELECT 
+			FILE_SEQ,
+			BOARD_SEQ,
+			ORIGIN_FILE_NAME,
+			EXTENSION_NAME,
+			FILE_SIZE,
+			SAVE_FILE_NAME,
+			SAVE_FILE_PATH,
+			FILE_URL,
+			FILE_KIND,
+			INST_ID,
+			INST_DATE
+		FROM 
+			TB_FILE
+		WHERE
+			FILE_SEQ = #{fileSeq}
+	</select>
+
+	<select id="selectFileList" parameterType="com.dokyuportfolio.admin.vo.BoardVO" resultType="com.dokyuportfolio.admin.vo.FileVO">
+		SELECT 
+			FILE_SEQ,
+			BOARD_SEQ,
+			ORIGIN_FILE_NAME,
+			EXTENSION_NAME,
+			FILE_SIZE,
+			SAVE_FILE_NAME,
+			SAVE_FILE_PATH,
+			FILE_URL,
+			FILE_KIND,
+			INST_ID,
+			INST_DATE
+		FROM 
+			TB_FILE
+		WHERE
+			BOARD_SEQ = #{boardSeq}
+			AND
+			FILE_KIND = 'file'
+	</select>
+
+	<select id="selectBoardDetail" parameterType="com.dokyuportfolio.admin.vo.BoardVO" resultType="com.dokyuportfolio.admin.vo.BoardVO">
+		SELECT
+			BOARD_SEQ,
+			TITLE,
+			CONTENT,
+			EXPLANATION,
+			MAIN_TOP_VIEW,
+			CATEGORY_ID,
+			INST_ID,
+			DATE_FORMAT(INST_DATE,'%Y-%m-%d') INST_DATE,
+			UPDT_ID,
+			UPDT_DATE
+		FROM
+			TB_BOARD
+		WHERE
+			BOARD_SEQ = #{boardSeq}
+	</select>
+
+	<select id="selectCategory" parameterType="com.dokyuportfolio.admin.vo.BoardVO" resultType="com.dokyuportfolio.admin.vo.CategoryVO">
+		SELECT
+			CATEGORY_SEQ,
+			CATEGORY_ID,
+			CATEGORY_NAME,
+			MAIN_VIEW_AREA,
+			INST_ID,
+			INST_DATE
+		FROM
+			TB_CATEGORY
+		WHERE
+			CATEGORY_ID = #{categoryId}
+	</select>
+	
+	<select id="selectBoardCount" parameterType="com.dokyuportfolio.admin.vo.BoardVO" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM
+			TB_BOARD
+		<where>
+			<if test="categoryId != null and categoryId != ''">
+				AND CATEGORY_ID = #{categoryId}
+			</if>
+		</where>
+	</select>
+
+	<select id="selectBoardList" parameterType="com.dokyuportfolio.admin.vo.BoardVO" resultType="com.dokyuportfolio.admin.vo.BoardVO">
+		SELECT
+			BOARD_SEQ,
+			TITLE,
+			CONTENT,
+			EXPLANATION,
+			MAIN_TOP_VIEW,
+			CATEGORY_ID,
+			INST_ID,
+			DATE_FORMAT(INST_DATE,'%Y-%m-%d') INST_DATE,
+			UPDT_ID,
+			UPDT_DATE
+		FROM
+			TB_BOARD
+		<where>
+			<if test="categoryId != null and categoryId != ''">
+				AND CATEGORY_ID = #{categoryId}
+			</if>
+		</where>
+		ORDER BY INST_DATE DESC
+		LIMIT #{startPostNumber} , #{blockPostCnt}
+	</select>
+	
+	<select id="selectMainTopView" resultType="com.dokyuportfolio.admin.vo.BoardVO">
+		SELECT 
+			BOARD_SEQ,
+			TITLE,
+			CONTENT,
+			EXPLANATION,
+			MAIN_TOP_VIEW,
+			CATEGORY_ID,
+			INST_ID,
+			INST_DATE,
+			UPDT_ID,
+			UPDT_DATE
+		FROM 
+			TB_BOARD 
+		WHERE 
+			MAIN_TOP_VIEW = 'Y'
+	</select>
+	
+	<select id="selectMainTopViewThumbnail" parameterType="com.dokyuportfolio.admin.vo.BoardVO" resultType="com.dokyuportfolio.admin.vo.FileVO">
+		SELECT * FROM TB_FILE WHERE BOARD_SEQ = #{boardSeq} AND FILE_KIND = 'thumbnail'
+	</select>
+	
+	<select id="selectMainView" parameterType="com.dokyuportfolio.admin.vo.CategoryVO" resultType="com.dokyuportfolio.admin.vo.BoardVO">
+		SELECT
+			BOARD_SEQ,
+			TITLE,
+			CONTENT,
+			EXPLANATION,
+			MAIN_TOP_VIEW,
+			CATEGORY_ID,
+			INST_ID,
+			INST_DATE,
+			UPDT_ID,
+			UPDT_DATE
+		FROM
+			TB_BOARD
+		WHERE
+			CATEGORY_ID = (SELECT CATEGORY_ID FROM TB_CATEGORY C WHERE MAIN_VIEW_AREA = #{mainViewArea})
+		ORDER BY INST_ID DESC
+		<choose>
+			<when test="mainViewArea == 'SIDEBAR'">
+				LIMIT 3
+			</when>
+			<otherwise>
+				LIMIT 6
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="selectMainViewSubject" parameterType="com.dokyuportfolio.admin.vo.CategoryVO" resultType="com.dokyuportfolio.admin.vo.CategoryVO">
+		SELECT * FROM TB_CATEGORY WHERE MAIN_VIEW_AREA = #{mainViewArea}
+	</select>
+	
+	<select id="loadCommentList" parameterType="com.dokyuportfolio.admin.vo.BoardVO" resultType="com.dokyuportfolio.board.vo.CommentVO">
+	  	SELECT * FROM TB_COMMENT WHERE TB_COMMENT_SEQ = #{boardSeq}
+	</select>
+	
+	<insert id="Commentwrite" parameterType="com.dokyuportfolio.board.vo.CommentVO">
+		INSERT INTO TB_COMMENT(
+			TB_COMMENT_SEQ,
+			TB_COMMENT_NUM,
+			TB_COMMENT_TITLE,
+			TB_COMMENT_COMMENT,
+			TB_COMMENT_REG_ID,
+			TB_COMMENT_REG_DATE,
+			TB_COMMENT_UDT_ID,
+			TB_COMMENT_UDT_DATE
+			)VALUES(
+			#{tbCommentSeq},
+			(SELECT IFNULL(MAX(TB_COMMENT_NUM)+1,1) FROM TB_COMMENT A),
+			#{tbCommentTitle},
+			#{tbCommentComment},
+			#{tbCommentRegId},
+			NOW(),
+			NULL,
+			NULL
+			);
+	</insert>
+	
+	<delete id="Commentdelete" parameterType="com.dokyuportfolio.board.vo.CommentVO">
+		 DELETE FROM TB_COMMENT WHERE TB_COMMENT_NUM = #{tbCommentNum}
+	</delete>
+	
+	<select id="selectSearchBoardList" parameterType="com.dokyuportfolio.admin.vo.BoardVO" resultType="com.dokyuportfolio.admin.vo.BoardVO">
+		SELECT
+			*
+		FROM 
+			TB_BOARD  
+		WHERE 
+			TITLE LIKE '%${title}%'
+		ORDER BY INST_DATE DESC
+		LIMIT #{startPostNumber} , #{blockPostCnt}
+	</select>
+	
+	<select id="selectBoardSearchCount" parameterType="com.dokyuportfolio.admin.vo.BoardVO" resultType="int">
+		SELECT
+			COUNT(*)
+		FROM 
+			TB_BOARD  
+		WHERE 
+			TITLE LIKE '%${title}%'
+	</select>
+	
+</mapper>
